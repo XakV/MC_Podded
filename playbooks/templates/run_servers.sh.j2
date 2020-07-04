@@ -1,0 +1,43 @@
+#!/bin/bash
+
+function run_bear() {
+  /usr/bin/podman run -dt --pod oakenkraft -i --name=paper_bear \
+   --mount type=bind,src=/srv/bear,dst=/srv \
+   bear-{{ paper_epoch }} java -jar -Xms1024M -Xmx2048M \
+   /srv/paper-{{ paper_epoch }}.jar nogui
+}
+
+function run_duck() {
+  /usr/bin/podman run -dt --pod oakenkraft -i --name=paper_duck \
+   --mount type=bind,src=/srv/duck,dst=/srv \
+   duck-{{ paper_epoch }} java -jar -Xms1024M -Xmx1024M \
+   /srv/paper-{{ paper_epoch }}.jar nogui
+}
+
+function run_goat() {
+  /usr/bin/podman run -dt --pod oakenkraft -i --name=paper_goat \
+   --mount type=bind,src=/srv/goat,dst=/srv goat-{{ paper_epoch }} \
+   java -jar -Xms1024M -Xmx2048M /srv/paper-{{ paper_epoch }}.jar nogui
+}
+
+function run_water() {
+  /usr/bin/podman run -dt --pod new:oakenkraft -p 25565-25569:25565-25568/tcp -i --name=waterfall \
+   --mount type=bind,src=/srv/waterfall,dst=/srv waterfall-{{ water_epoch }} \
+   java -jar -Xms256M -Xmx512M /srv/waterfall-{{ water_epoch }}.jar nogui
+   
+}
+
+function get_pod_state() {
+  oakenState=$(/usr/bin/podman pod ps | grep oakenState)
+}
+
+function main() {
+  get_pod_state
+  if $? -eq 0;
+  then
+      /usr/bin/podman pod rm -f oakenkraft
+  fi
+  run_water && run_bear && run duck && run_goat
+}
+
+main

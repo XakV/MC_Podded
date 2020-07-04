@@ -1,0 +1,24 @@
+- hosts: localhost
+  connection: local
+  vars:
+    v_paper: "1.16.1"
+    v_waterfall: "1.16"
+  tasks:
+    - name: get latest paper jar
+      get_url:
+        url: "https://papermc.io/api/v1/paper/{{ v_paper }}/latest/download"
+        dest: ~/ansible/playbooks/files/
+        mode: 0750
+      register: paper_dl
+
+    - name: get latest waterfall jar
+      get_url:
+        url: "https://papermc.io/api/v1/waterfall/{{ v_waterfall }}/latest/download"
+        dest: ~/ansible/playbooks/files/
+        mode: 0750
+      register: water_dl
+
+    - name: recreate the main vars file
+      template: 
+        src: templates/main.yml.j2
+        dest: /home/zach/ansible/playbooks/vars/main.yml

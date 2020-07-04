@@ -1,0 +1,18 @@
+---
+java_base_img: 'localhost/java8'
+
+mc_servers: 
+  - 'duck'
+  - 'goat'
+  - 'bear'
+  - 'bungee'
+
+host_ports:
+  - { 'name': 'duck', 'port': '25567' }
+  - { 'name': 'goat', 'port': '25567' }
+  - { 'name': 'bear', 'port': '25568' }
+  - { 'name': 'bungee', 'port': '25565' }
+
+paper_ver: paper-21.jar
+
+waterfall_ver: waterfall-358.jar

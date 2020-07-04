@@ -1,0 +1,41 @@
+- hosts: localhost
+# become: true
+  gather_facts: false
+  tasks:
+    - name: load the vars
+      include_vars: main.yml
+
+    - name: clean up if needed
+      shell: "buildah rm {{ item }}"
+      loop: "{{ mc_servers }}"
+      failed_when: false
+
+    - name: copy server jars to server dirs
+      copy:
+        src: "{{ paper_ver }}"
+        dest: "/srv/{{ item }}/{{ paper_ver }}"
+      loop: 
+        - "duck"
+        - "goat"
+        - "bear"
+
+    - name: copy waterfall jar
+      copy:
+        src: "{{ waterfall_ver }}"
+        dest: "/srv/waterfall/{{ waterfall_ver }}"
+
+    - name: the facts of the matter of the container situation
+      set_fact:
+        paper_epoch: "{{ paper_ver | regex_search('[0-9][0-9]')| quote }}"
+        water_epoch: "{{ waterfall_ver | regex_search('[3-9][0-9][0-9]')| quote }}"
+
+    - name: rebuild container config shell script
+      template:
+        src: container_config.sh.j2
+        dest: /home/zach/ansible/playbooks/files/container_config.sh
+     
+    - name: rebuild run_server shell script
+      template:
+        src: run_servers.sh.j2
+        dest: /home/zach/ansible/playbooks/files/run_servers.sh
+        mode: 0755

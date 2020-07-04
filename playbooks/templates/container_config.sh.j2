@@ -1,0 +1,22 @@
+#!/bin/bash
+
+{% for server in mc_servers %}
+working_{{ server }}=$(/usr/bin/buildah from --name {{ server }} {{ java_base_img }})
+/usr/bin/buildah config --workingdir /srv $working_{{ server }}
+{% endfor %}
+
+working_waterfall=$(/usr/bin/buildah from --name {{ waterfall_ver }} {{ java_base_img }})
+/usr/bin/buildah config --workingdir /srv $working_waterfall
+
+/usr/bin/buildah config --port 25565 $working_waterfall
+/usr/bin/buildah config --port 25566 $working_duck
+/usr/bin/buildah config --port 25567 $working_bear
+/usr/bin/buildah config --port 25568 $working_goat
+
+{% for server in mc_servers %}
+/usr/bin/buildah commit --rm --squash $working_{{ server }} {{ server }}-{{ paper_epoch }}
+{% endfor %}
+
+/usr/bin/buildah commit --rm --squash $working_waterfall waterfall-{{ water_epoch }}
+
+
